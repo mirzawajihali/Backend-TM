@@ -5,8 +5,6 @@ import cors from 'cors';
 import { router } from './app/routes';
 
 import { globalErrorHandler } from './app/middlewares/globalErrorHandler';
-
-import httpStatus from 'http-status-codes';
 import notFound from './app/middlewares/notFound';
 
 const app = express();

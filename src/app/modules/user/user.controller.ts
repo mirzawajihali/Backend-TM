@@ -1,10 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 
 import { userServices } from "./user.services";
+import AppError from "../../errorHelpers/AppError";
+import httpStatus from "http-status-codes";
 
 const createUser = async (req : Request, res : Response, next : NextFunction) => {
 
     try{
+
+        throw new AppError(httpStatus.BAD_REQUEST, "Invalid user data");
         
         const user = await userServices.createUser(req.body);
 

@@ -18,7 +18,7 @@ const startServer = async () => {
 
     console.log('Connected to MongoDB');
     server = app.listen(env.PORT, () => {
-        console.log('Server is running on port 3000');
+        console.log(`Server is running on port ${env.PORT}`);
     });
    }catch(error){
     console.log(error);
@@ -29,30 +29,30 @@ const startServer = async () => {
 startServer();
 
 
-process.on('unhandledRejection', () => {
-    console.log(' Unhandled Rejection received: closing HTTP server');
+process.on('unhandledRejection', (err: unknown) => {
+    console.log('Unhandled Rejection received:', err);
+    console.log('Closing HTTP server');
     if (server) {
         server.close(() => {
             console.log('HTTP server closed');
             process.exit(1);
         });
-    
+    } else {
+        process.exit(1);
     }
-
-    process.exit(1);
 });
 
-process.on("uncaughtException", () => {
-    console.log(' Uncaught Exception received: closing HTTP server');
+process.on("uncaughtException", (err: unknown) => {
+    console.log('Uncaught Exception received:', err);
+    console.log('Closing HTTP server');
     if (server) {
         server.close(() => {
             console.log('HTTP server closed');
             process.exit(1);
         });
-    
+    } else {
+        process.exit(1);
     }
-
-    process.exit(1);
 });
 
 

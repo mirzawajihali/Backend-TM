@@ -27,7 +27,7 @@ export const seedSuperAdmin = async () => {
             password : hashedPassword,}
 
 
-        const superAdmin = await User.create({payload});
+        const superAdmin = await User.create(payload);
         console.log("Super Admin seeded successfully:", superAdmin.email);
     }
     catch (error) {

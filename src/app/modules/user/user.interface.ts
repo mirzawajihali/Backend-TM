@@ -37,7 +37,7 @@ export interface IUser {
     phone ?: string;
     picture ?: string;
     address ?: string;
-    inDeleted ?: boolean;
+    isDeleted ?: boolean;
     isActive ?: isActive;
     isVarified ?: boolean;
     auths : IAuthProvider[];

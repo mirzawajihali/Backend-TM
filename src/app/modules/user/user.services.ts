@@ -1,8 +1,11 @@
 import AppError from "../../errorHelpers/AppError";
-import { IAuthProvider, IUser } from "./user.interface";
+import { IAuthProvider, IUser, Role } from "./user.interface";
 import { User } from "./user.model";
 import httpStatus from "http-status-codes";
 import bcryptjs from "bcryptjs";
+import { JwtPayload } from "jsonwebtoken";
+import { env } from "../../config/env";
+
 
 
 
@@ -35,6 +38,45 @@ const createUser = async (payload : Partial<IUser>) =>{
 }
 
 
+const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken: JwtPayload) => {
+
+    const ifUserExist = await User.findById(userId);
+
+    if (!ifUserExist) {
+        throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    }
+
+    // Role update authorization
+    if (payload.role) {
+        // Only SUPER_ADMIN can update roles
+        if (decodedToken.role !== Role.SUPER_ADMIN) {
+            throw new AppError(httpStatus.FORBIDDEN, "Only Super Admin can update user roles");
+        }
+
+        // Optional: Prevent SUPER_ADMIN from downgrading themselves
+        if (decodedToken.user_id === userId && payload.role !== Role.SUPER_ADMIN) {
+            throw new AppError(httpStatus.FORBIDDEN, "Super Admin cannot downgrade their own role");
+        }
+    }
+
+    // Status update authorization (isActive, isVarified, isDeleted)
+    if (payload.isActive !== undefined || payload.isVarified !== undefined || payload.isDeleted !== undefined) {
+        // Only ADMIN and SUPER_ADMIN can update user status
+        if (decodedToken.role !== Role.ADMIN && decodedToken.role !== Role.SUPER_ADMIN) {
+            throw new AppError(httpStatus.FORBIDDEN, "You are not authorized to update user status");
+        }
+    }
+
+    // Hash password if provided
+    if (payload.password) {
+        payload.password = await bcryptjs.hash(payload.password as string, Number(env.BCRYPT_SALT_ROUNDS));
+    }
+
+    const newUpdateUser = await User.findByIdAndUpdate(userId, payload, { new: true, runValidators: true });
+
+    return newUpdateUser;
+}
+
 const getAllUsers = async () => {
     const users = await User.find({});
     const totalUsers = await User.countDocuments();
@@ -44,5 +86,6 @@ const getAllUsers = async () => {
 
 export const userServices ={
     createUser,
-    getAllUsers
+    getAllUsers,
+    updateUser
 }

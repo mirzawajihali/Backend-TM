@@ -9,7 +9,7 @@ const credentialsLogin =  catchAsync(async (req: Request, res: Response, next: N
 
     const loginInfo = await authServices.credentialsLogin(req.body)
    
-
+    
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.CREATED,

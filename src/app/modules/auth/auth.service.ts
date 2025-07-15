@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { IUser } from "../user/user.interface"
 import { User } from "../user/user.model";
 import httpStatus from "http-status-codes";
@@ -35,11 +36,18 @@ const credentialsLogin = async (payload : Partial<IUser>) =>{
     // );
 
     const accessToken = generateToken(jwtPayload, env.JWT_ACCESS_SECRET, env.JWT_ACCESS_EXPIRES);
+
+    const refreshToken = generateToken(jwtPayload, env.JWT_REFRESH_SECRET, env.JWT_REFRESH_EXPIRES);
+
+    // delete await isUserExist.password;
     
+    const  {password : pass  , ...rest} = isUserExist.toObject();
 
     return {
             
-            accessToken
+            accessToken,
+            refreshToken,
+            user : rest
     }
 }
 

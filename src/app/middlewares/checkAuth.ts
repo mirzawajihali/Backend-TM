@@ -19,6 +19,8 @@ export const checkAuth  = (...authRoles : string[]) => async (req: Request, res:
     if(!authRoles.includes(verifiedToken.role))  {
         throw new AppError(403, "You are not authorized to access this resource");
     }
+
+    req.user = verifiedToken
     
     next();
    }

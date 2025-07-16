@@ -3,7 +3,9 @@ import  { JwtPayload } from "jsonwebtoken";
 import AppError from "../errorHelpers/AppError";
 import { verifyToken } from "../utils/jwt";
 import { env } from "../config/env";
-
+import { User } from "../modules/user/user.model";
+import { isActive } from "../modules/user/user.interface";
+import httpStatus from "http-status-codes";
 
 
 export const checkAuth  = (...authRoles : string[]) => async (req: Request, res: Response, next: NextFunction) =>{
@@ -14,6 +16,19 @@ export const checkAuth  = (...authRoles : string[]) => async (req: Request, res:
     }
 
     const verifiedToken= verifyToken(accessToken, env.JWT_ACCESS_SECRET) as JwtPayload
+    
+    const isUserExist = await User.findOne({email : verifiedToken.email});
+    
+    // Fix: Check if user DOESN'T exist (opposite logic)
+    if(!isUserExist){
+        throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    }
+    if(isUserExist.isActive === isActive.BLOCKED){
+        throw new AppError(httpStatus.NOT_FOUND, "User is blocked");
+    }
+    if(isUserExist.isDeleted){
+        throw new AppError(httpStatus.NOT_FOUND, "User is deleted");
+    }
 
    
     if(!authRoles.includes(verifiedToken.role))  {

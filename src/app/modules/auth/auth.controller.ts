@@ -6,6 +6,8 @@ import { authServices } from "./auth.service";
 import AppError from "../../errorHelpers/AppError";
 import { setAuthCookie } from "../../utils/setCookie";
 import { JwtPayload } from "jsonwebtoken";
+import { createUserTokens } from "../../utils/userTokens";
+import { env } from "../../config/env";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const credentialsLogin =  catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -100,11 +102,24 @@ const resetPassword =  catchAsync(async (req: Request, res: Response, next: Next
         data : null,
     })
 })
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const googleCallbackController =  catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    
+    const user = req.user;
+    if(!user){
+        throw new AppError(httpStatus.BAD_REQUEST, "User not found");
+    }
+    const tokenInfo =  createUserTokens(user );
+    setAuthCookie(res, tokenInfo);
+
+    res.redirect(`${env.FRONTEND_URL}/booking`)
+})
 
 export const AuthControllers = {
     credentialsLogin,
     getNewAccessToken,
     logout,
-    resetPassword
+    resetPassword,
+    googleCallbackController
     
 }

@@ -105,6 +105,13 @@ const resetPassword =  catchAsync(async (req: Request, res: Response, next: Next
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const googleCallbackController =  catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     
+
+    let redirectTo = req.query.state ? req.query.state as string : "" as string;
+
+    if(redirectTo.startsWith("/")){
+        redirectTo = redirectTo.slice(1);
+    }
+   
     const user = req.user;
     if(!user){
         throw new AppError(httpStatus.BAD_REQUEST, "User not found");
@@ -112,7 +119,7 @@ const googleCallbackController =  catchAsync(async (req: Request, res: Response,
     const tokenInfo =  createUserTokens(user );
     setAuthCookie(res, tokenInfo);
 
-    res.redirect(`${env.FRONTEND_URL}/booking`)
+    res.redirect(`${env.FRONTEND_URL}/${redirectTo}`); // Redirect to the frontend with tokens
 })
 
 export const AuthControllers = {

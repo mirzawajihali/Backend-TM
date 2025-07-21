@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { catchAsync } from "../../utils/catchAsync";
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
@@ -8,11 +9,39 @@ import { setAuthCookie } from "../../utils/setCookie";
 import { JwtPayload } from "jsonwebtoken";
 import { createUserTokens } from "../../utils/userTokens";
 import { env } from "../../config/env";
+import passport from "passport";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const credentialsLogin =  catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
-    const loginInfo = await authServices.credentialsLogin(req.body)
+    // const loginInfo = await authServices.credentialsLogin(req.body)
+    passport.authenticate("local", async(err : any, user : any, info : any) =>{
+
+        if(err){
+            return next(new AppError(httpStatus.INTERNAL_SERVER_ERROR, "Internal server error"));
+        }
+
+        if(!user){
+            return next(new AppError(401, info.message));
+        }
+
+        const userTokens = createUserTokens(user);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const {password : pass  , ...rest } = user.toObject();// Remove password from user object
+         setAuthCookie(res, userTokens)
+
+    
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: "login Successfully",
+        data : {
+            accessToken : userTokens.accessToken,
+            refreshToken : userTokens.refreshToken,
+            user : rest 
+        },
+    })  
+    })(req, res, next) 
    
     // res.cookie('refreshToken', loginInfo.refreshToken, {
     //     httpOnly: true,
@@ -26,14 +55,7 @@ const credentialsLogin =  catchAsync(async (req: Request, res: Response, next: N
     //     secure : false,
     // })
 
-    setAuthCookie(res, loginInfo)
-    
-    sendResponse(res, {
-        success: true,
-        statusCode: httpStatus.CREATED,
-        message: "login Successfully",
-        data : loginInfo,
-    })
+   
 })
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getNewAccessToken =  catchAsync(async (req: Request, res: Response, next: NextFunction) => {

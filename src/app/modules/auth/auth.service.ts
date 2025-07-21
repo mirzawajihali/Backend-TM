@@ -12,37 +12,37 @@ import { JwtPayload } from "jsonwebtoken";
 import { env } from "../../config/env";
 
 
-const credentialsLogin = async (payload : Partial<IUser>) =>{
+// const credentialsLogin = async (payload : Partial<IUser>) =>{
 
-    const {email, password} = payload;
+//     const {email, password} = payload;
 
-    const isUserExist = await User.findOne({email});
+//     const isUserExist = await User.findOne({email});
     
-    // Fix: Check if user DOESN'T exist (opposite logic)
-    if(!isUserExist){
-        throw new AppError(httpStatus.NOT_FOUND, "User not found");
-    }
+//     // Fix: Check if user DOESN'T exist (opposite logic)
+//     if(!isUserExist){
+//         throw new AppError(httpStatus.NOT_FOUND, "User not found");
+//     }
 
-    const isPassWordMatched = await bcryptjs.compare(password as string, isUserExist.password as string);
+//     const isPassWordMatched = await bcryptjs.compare(password as string, isUserExist.password as string);
     
 
-    if(!isPassWordMatched){
-        throw new AppError(httpStatus.UNAUTHORIZED, "Invalid credentials");
-    }
+//     if(!isPassWordMatched){
+//         throw new AppError(httpStatus.UNAUTHORIZED, "Invalid credentials");
+//     }
 
    
 
-    const userTokens = createUserTokens(isUserExist)
+//     const userTokens = createUserTokens(isUserExist)
     
-    const  {password : pass  , ...rest} = isUserExist.toObject();
+//     const  {password : pass  , ...rest} = isUserExist.toObject();
 
-    return {
+//     return {
             
-            accessToken : userTokens.accessToken,
-            refreshToken : userTokens.refreshToken,
-            user : rest
-    }
-}
+//             accessToken : userTokens.accessToken,
+//             refreshToken : userTokens.refreshToken,
+//             user : rest
+//     }
+// }
 const getNewAccessToken = async (refreshToken : string) =>{
    
     
@@ -77,7 +77,7 @@ const resetPassword = async (oldPassword : string, newPassword : string,  decode
 }
 
 export  const authServices ={
-    credentialsLogin,
+   
     getNewAccessToken,
     resetPassword
 }

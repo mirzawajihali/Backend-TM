@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express"
+import  { NextFunction, Request, Response } from "express"
 import { env } from "../config/env"
 import AppError from "../errorHelpers/AppError";
 import { handleCastError } from "../helpers/handleCastError";
@@ -9,6 +9,10 @@ import { TErrorSources } from "../interfaces/error.types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
 export const globalErrorHandler = (err : any ,req : Request, res : Response, next : NextFunction ) =>{
+
+    if(env.NODE_ENV === 'production') {
+        console.log(err)
+    }
 
     let statusCode =  500;
     let message = "Something went wrong";

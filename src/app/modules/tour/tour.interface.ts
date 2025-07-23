@@ -9,7 +9,7 @@ export interface ITourType {
 export interface ITour{
     title :string;
     slug: string;
-    thumbnail : string;
+    thumbnail ?: string;
     description ?: string;
     images ?: string[];
     location? : string;

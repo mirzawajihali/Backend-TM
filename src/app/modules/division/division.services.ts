@@ -9,6 +9,18 @@ const createDivision = async (payload : Partial<IDivision>) =>{
         throw new Error("A division with this name already exists.");
     }
 
+    const baseSlug =payload.name?  payload.name.toLowerCase().split(" ").join("-") : " ";
+
+    let slug =`${baseSlug}-division`;
+
+    let count =0;
+
+
+    while(await Division.exists({slug})){
+        slug = `${baseSlug}-division-${count++}}`;
+    }
+
+
 
     
 

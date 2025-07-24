@@ -46,17 +46,20 @@ const updateUser = catchAsync(async (req: Request, res: Response, next: NextFunc
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const result = await userServices.getAllUsers();
+    const query = req.query;
+    const result = await userServices.getAllUsers(query as Record<string, string>);
 
-
-
-sendResponse(res, {
+    // res.status(httpStatus.OK).json({
+    //     success: true,
+    //     message: "All Users Retrieved Successfully",
+    //     data: users
+    // })
+    sendResponse(res, {
         success: true,
         statusCode: httpStatus.CREATED,
-        message: "User Created Successfully",
-        data : result.data,
+        message: "All Users Retrieved Successfully",
+        data: result.data,
         meta: result.meta
-
     })
 })
 // function => try-catch catch => req-res function
